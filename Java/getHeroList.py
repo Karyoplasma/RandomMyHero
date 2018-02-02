@@ -1,40 +1,38 @@
-import os, requests, bs4
+import requests
+import bs4
 
 def getHeroList():
+    '''Get a list of heroes from gamepedia and write to heroList.txt'''
     res = requests.get('https://dota2.gamepedia.com/Heroes')
     res.raise_for_status()
     print('Fetching hero list...')
     soup = bs4.BeautifulSoup(res.text, 'html.parser')
     masterTable = soup.select('table')
     heroTables = masterTable[0].findAll('tr')
+
     strength = "Strength="
     strHeroes = heroTables[1].findAll('span')
-    for x in range(0,len(strHeroes)):
-        strength += strHeroes[x].text
-        if x != len(strHeroes) - 1:
-            strength += ','
+    strength += ','.join(hero.text for hero in strHeroes)
+
     agility = "Agility="
     agiHeroes = heroTables[3].findAll('span')
-    for x in range(0,len(agiHeroes)):
-        agility += agiHeroes[x].text
-        if x != len(agiHeroes) - 1:
-            agility += ','
+    agility += ','.join(hero.text for hero in agiHeroes)
+
     intelligence = "Intelligence="
     intHeroes = heroTables[5].findAll('span')
-    for x in range(0,len(intHeroes)):
-        intelligence += intHeroes[x].text
-        if x != len(intHeroes) - 1:
-            intelligence += ','
+    intelligence += ','.join(hero.text for hero in intHeroes)
+
     print('Writing hero list to file...')
-    file = open("heroList.txt", 'w')
-    file.write(strength)
-    file.write('\n')
-    file.write(agility)
-    file.write('\n')
-    file.write(intelligence)
-    file.write('\n')
-    file.close()
+
+    with open("heroList.txt", 'w') as f:
+        f.write(strength)
+        f.write('\n')
+        f.write(agility)
+        f.write('\n')
+        f.write(intelligence)
+        f.write('\n')
+
     print('Done.')
 
-    
-getHeroList()
+if __name__ == '__main__':
+    getHeroList()
